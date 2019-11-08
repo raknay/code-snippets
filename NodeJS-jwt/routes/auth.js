@@ -3,6 +3,7 @@ const User = require("../model/User");
 const {registerValication, loginValidation} = require("../validation/validation");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const auth = require("../middleware/verifytoken")
 
 router.post("/register", async (req, res) => {
     try{
@@ -43,20 +44,20 @@ router.post("/login", async (req, res) => {
         }
         // create and assign token
         const token = jwt.sign({email : user.email}, process.env.TOKEN_SECRET);
-        res.header("auth-token", token);
+        res.header("auth-token", token).send(token);
         // console.log(token);
-        res.send("Logged in");
+        // res.send("Logged in");
 
     }catch(error){
         res.status(400).send(error);
     }
+});
 
-    router.get("/posts", (req, res) => {
-        res.json({posts: {
-            title: "first post", 
-            description: "private post"
-        }});
-    });
+router.get("/posts", auth, (req, res) => {
+    res.json({posts: {
+        title: "first post", 
+        description: "private post"
+    },email: req.user.email});
 });
 
 module.exports = router;

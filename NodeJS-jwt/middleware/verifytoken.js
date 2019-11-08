@@ -9,7 +9,10 @@ function auth(req, res, next){
     try{
         const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
         req.user = decoded;
+        next();
     }catch(error){
         res.status(400).send("invalid token");
     }
 }
+
+module.exports = auth;
